@@ -1,6 +1,4 @@
-
 public class Search {
-
 
     public Move IterativeDeepeningSearch(IsolationBoard board){
         Move bestMove = null;
@@ -11,11 +9,9 @@ public class Search {
         return bestMove;
     }
 
-
-    public Move depthLimitedSearch(Board board, int limit){
+    public Move depthLimitedSearch(IsolationBoard board, int limit){
 
     }
-
 
     public Move alphaBetaSearch(IsolationBoard board){
         return this.abValue(board, Integer.MIN_VALUE, Integer.MAX_VALUE);
