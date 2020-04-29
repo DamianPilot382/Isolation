@@ -3,6 +3,14 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args){
+        IsolationBoard board = new IsolationBoard();
+
+        System.out.println(board);
+
+        board.getPossibleMoves(Player.X);
+    }
+
+    public static void mains(String[] args){
         Scanner in = new Scanner(System.in);
 
         startGame(in);
