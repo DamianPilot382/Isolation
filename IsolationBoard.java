@@ -1,4 +1,3 @@
-import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -7,16 +6,17 @@ public class IsolationBoard {
 
     protected int[] locX;
     protected int[] locO;
-    protected boolean[][] usedSpaces;
-    protected LinkedList<int[]> moves;
+    protected boolean[] usedSpaces;
+    protected int spacesLeft;
+
 
     public IsolationBoard(){
         this.locX = new int[]{0, 0};
         this.locO = new int[]{7, 7};
-        this.usedSpaces = new boolean[8][8];
-        this.usedSpaces[0][0] = true;
-        this.usedSpaces[7][7] = true;
-        this.moves = new LinkedList<>();
+        this.usedSpaces = new boolean[64];
+        this.usedSpaces[0] = true;
+        this.usedSpaces[64] = true;
+        this.spacesLeft = 62;
     }
 
     public List<Move> getPossibleMoves(Player player){
@@ -61,56 +61,56 @@ public class IsolationBoard {
             }
 
             if(up){
-                if(usedSpaces[loc[0] - i][loc[1]])
+                if(getBoard(loc[0]-i, loc[1]))
                     up = false;
                 else
                     moves.add(new Move(loc[0] - i, loc[1]));
             }
 
             if(down){
-                if(usedSpaces[loc[0] + i][loc[1]])
+                if(getBoard(loc[0]+i, loc[1]))
                     down = false;
                 else
                     moves.add(new Move(loc[0] + i, loc[1]));
             }
 
             if(left){
-                if(usedSpaces[loc[0]][loc[1]-i])
+                if(getBoard(loc[0], loc[1]-i))
                     down = false;
                 else
                     moves.add(new Move(loc[0], loc[1]-i));
             }
             
             if(right){
-                if(usedSpaces[loc[0]][loc[1]+i])
+                if(getBoard(loc[0], loc[1]+i))
                     down = false;
                 else
                     moves.add(new Move(loc[0], loc[1]+i));
             }
 
             if(upLeft){
-                if(usedSpaces[loc[0]-i][loc[1]-i])
+                if(getBoard(loc[0]-i, loc[1]-i))
                     down = false;
                 else
                     moves.add(new Move(loc[0]-i, loc[1]-i));
             }
 
             if(upRight){
-                if(usedSpaces[loc[0]-i][loc[1]+i])
+                if(getBoard(loc[0]-i, loc[1]+i))
                     down = false;
                 else
                     moves.add(new Move(loc[0]-i, loc[1]+i));
             }
 
             if(downLeft){
-                if(usedSpaces[loc[0]+i][loc[1]-i])
+                if(getBoard(loc[0]+i, loc[1]-i))
                     down = false;
                 else
                     moves.add(new Move(loc[0]+i, loc[1]-i));
             }
 
             if(downRight){
-                if(usedSpaces[loc[0]+i][loc[1]+i])
+                if(getBoard(loc[0]+i, loc[1]+i))
                     down = false;
                 else
                     moves.add(new Move(loc[0]+i, loc[1]+i));
@@ -125,24 +125,28 @@ public class IsolationBoard {
     }
 
     public void setBoard(boolean value, int row, int col){
-
+        usedSpaces[(row << 3) + col] = value;
     }
 
     public boolean getBoard(int row, int col){
-        return false;
+        return usedSpaces[(row << 3) + col];
     }
 
-    public boolean move(Move move){
-        return true;c
+    public void move(Player player, Move move){
+        int[] loc = player == Player.X? locX : locO;
+        setBoard(true, loc[0], loc[1]);
+        spacesLeft--;
     }
 
     public IsolationBoard copy(){
         IsolationBoard copy = new IsolationBoard();
 
-        copy.locO = Arrays.copyOf(locO, locO.length);
-        copy.locX = Arrays.copyOf(locX, locX.length);
+        copy.locO = Arrays.copyOf(this.locO, locO.length);
+        copy.locX = Arrays.copyOf(this.locX, locX.length);
 
-        copy.usedSpaces = Arrays.copyOf(usedSpaces);
+        copy.usedSpaces = Arrays.copyOf(this.usedSpaces, usedSpaces.length);
+
+        copy.spacesLeft = this.spacesLeft;
 
         return copy;
     }
@@ -150,14 +154,14 @@ public class IsolationBoard {
     @Override
     public String toString(){
         StringBuilder builder = new StringBuilder("  1 2 3 4 5 6 7 8\tComputer vs. Opponent\n");
-        for(int i = 0; i < usedSpaces.length; i++){
+        for(int i = 0; i < 8; i++){
             builder.append((char)(65 + i) + " ");
-            for(int j = 0; j < usedSpaces[0].length; j++){
+            for(int j = 0; j < 8; j++){
                 if(locX[0] == i && locX[1] == j)
                     builder.append("X ");
                 else if(locO[0] == i && locO[1] == j)
                     builder.append("O ");
-                else if(usedSpaces[i][j])
+                else if(getBoard(i, j))
                     builder.append("# ");
                 else
                     builder.append("- ");
@@ -181,6 +185,20 @@ public class IsolationBoard {
 
         return result;
 
+    }
+
+    public int value(Heuristic heuristic){
+        switch(heuristic){
+            case MOVE_COUNT:
+                return getMoveCountHeuristic();
+            default:
+                return 0;
+        }
+
+    }
+
+    private int getMoveCountHeuristic(){
+        return -1;
     }
 
 }

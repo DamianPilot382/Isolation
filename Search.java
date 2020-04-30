@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class Search {
 
     public Move IterativeDeepeningSearch(IsolationBoard board){
@@ -17,13 +19,18 @@ public class Search {
         return this.abValue(board, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
+    
+
+
+
+
     public int abValue(boolean isMax, IsolationBoard board, int alpha, int beta){
         if(board.gameOver())
-            return board.value();
+            return board.value(Heuristic.MOVE_COUNT);
 
         int v = isMax? Integer.MIN_VALUE : Integer.MAX_VALUE;
         
-        Move[] successors = board.getSuccessors();
+        List<Move> successors = board.getPossibleMoves(isMax? Player.X: Player.O);
 
         for(Move move : successors){
             v = isMax? Math.max(v, abValue(false, board, alpha, beta)):

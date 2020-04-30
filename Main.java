@@ -72,10 +72,26 @@ public class Main {
         return timeout;
     }
 
-    public static boolean validateMove(String input){
+    public static Move getMove(Scanner in){
+        while(true){
+
+            System.out.print("Enter opponent's move: ");
+
+            String input = in.next().toUpperCase();
+
+            Move move = validateMove(input);
+            if(move != null)
+                return move;
+            else
+                System.out.println("Invalid input. Please try again.");
+                
+        }
+    }
+
+    public static Move validateMove(String input){
 
         if(input.length() != 2)
-            return false;
+            return null;
 
         int row = (int)(input.charAt(0));
         int col = (int)(input.charAt(1));
@@ -83,12 +99,12 @@ public class Main {
         System.out.println(row + " " + col);
 
         if(row < 65 || row > 73)
-            return false;
+            return null;
 
         if(col < 1 || col > 8)
-            return false;
+            return null;
 
-        return true;
+        return new Move(65 - row, col - 1);
 
     }
 
