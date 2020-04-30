@@ -5,10 +5,10 @@ import java.util.Arrays;
 
 public class IsolationBoard {
 
-    private int[] locX;
-    private int[] locO;
-    private boolean[][] usedSpaces;
-    private LinkedList<int[]> moves;
+    protected int[] locX;
+    protected int[] locO;
+    protected boolean[][] usedSpaces;
+    protected LinkedList<int[]> moves;
 
     public IsolationBoard(){
         this.locX = new int[]{0, 0};
@@ -122,6 +122,29 @@ public class IsolationBoard {
         }
 
         return moves;
+    }
+
+    public void setBoard(boolean value, int row, int col){
+
+    }
+
+    public boolean getBoard(int row, int col){
+        return false;
+    }
+
+    public boolean move(Move move){
+        return true;c
+    }
+
+    public IsolationBoard copy(){
+        IsolationBoard copy = new IsolationBoard();
+
+        copy.locO = Arrays.copyOf(locO, locO.length);
+        copy.locX = Arrays.copyOf(locX, locX.length);
+
+        copy.usedSpaces = Arrays.copyOf(usedSpaces);
+
+        return copy;
     }
 
     @Override

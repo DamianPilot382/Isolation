@@ -72,8 +72,6 @@ public class Main {
         return timeout;
     }
 
-
-
     public static boolean validateMove(String input){
 
         if(input.length() != 2)
