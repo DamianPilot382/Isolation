@@ -7,6 +7,8 @@ public class IsolationBoard {
     protected int[] locX;
     protected int[] locO;
     protected boolean[] usedSpaces;
+    protected List<Move> movesX;
+    protected List<Move> movesO;
 
 
     public IsolationBoard(){
@@ -21,7 +23,20 @@ public class IsolationBoard {
 
         List<Move> moves = new ArrayList<Move>(32);
 
-        int[] loc = (player == Player.X)? locX : locO;
+        int[] loc;
+        if(player == Player.X){
+            if(movesX != null)
+                return movesX;
+
+            loc = locX;
+            movesX = moves;
+        }else{
+            if(movesO != null)
+                return movesO;
+
+            loc = locO;
+            movesO = moves;
+        }
 
         boolean left = true;
         boolean right = true;
@@ -103,6 +118,9 @@ public class IsolationBoard {
         loc[1] = move.col;
 
         setBoard(true, loc[0], loc[1]);
+
+        movesX = null;
+        movesO = null;
     }
 
     public void remove(Player player, Move move){
@@ -112,6 +130,9 @@ public class IsolationBoard {
 
         loc[0] = move.row;
         loc[1] = move.col;
+
+        movesX = null;
+        movesO = null;
 
     }
 
@@ -186,8 +207,26 @@ public class IsolationBoard {
     
     }
 
-    public int evaluate(){
-        return 1;
+    public int evaluate(Player player){
+        int[] loc = player == Player.X? locX: locO;
+
+        int computerMovesAvailable = getPossibleMoves(player).size();
+        int opponentMovesAvailable = getPossibleMoves(Player.opponent(player)).size();
+
+        int[] closenessToCenterMatrix = new int[]{
+            0, 1, 2, 3, 3, 2, 1, 0,
+            1, 2, 3, 4, 4, 3, 2, 1,
+            2, 3, 4, 5, 5, 4, 3, 2,
+            3, 4, 5, 6, 6, 5, 4, 3,
+            3, 4, 5, 6, 6, 5, 4, 3,
+            2, 3, 4, 5, 5, 4, 3, 2,
+            1, 2, 3, 4, 4, 3, 2, 1,
+            0, 1, 2, 3, 3, 2, 1, 0,
+        };
+
+        int closenessToCenterValue = closenessToCenterMatrix[(loc[0] << 3) + loc[1]];
+
+        return ((computerMovesAvailable - opponentMovesAvailable) << 1) + closenessToCenterValue;
     }
 
 }

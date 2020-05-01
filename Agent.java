@@ -9,69 +9,120 @@ public class Agent {
 
     public Agent(int time, Player computerPlayer){
 
-        this.time = time;
+        this.time = time * 1000;
 
         this.computerPlayer = computerPlayer;
-        this.opponentPlayer = (computerPlayer == Player.X)? Player.O : Player.X;
-
-        this.maxDepth = 5;
+        this.opponentPlayer = Player.opponent(computerPlayer);
 
     }
 
-    public Move search(){
-        return iterativeDeepening();
+    public Move search(IsolationBoard board){
+        start = System.currentTimeMillis();
+        return iterativeDeepening(board);
     }
 
-    public Move alphaBetaSearch(IsolationBoard board, int depth){
+    public Move iterativeDeepening(IsolationBoard board) {
+        Move bestMove = null;
+        int depth = 3;
 
-        maxValue(board, Integer.MIN_VALUE, Integer.MAX_VALUE, depth);
+        try{
+            while(true){
+                bestMove = alphaBetaSearch(board, depth);
+    
+                depth++;
+            }
+        }catch(NoTimeException e){
+            return bestMove;
+        }
 
     }
 
-    public int maxValue(IsolationBoard board, int alpha, int beta, int depth){
+    public Move alphaBetaSearch(IsolationBoard board, int depth) throws NoTimeException {
+
+        return maxValue(board, Integer.MIN_VALUE, Integer.MAX_VALUE, depth).move;
+
+    }
+
+    public MinMaxTuple maxValue(IsolationBoard board, int alpha, int beta, int depth) throws NoTimeException {
+
+        checkTime();
 
         if(board.isTerminal(this.computerPlayer))
-            return Integer.MIN_VALUE;
+            return new MinMaxTuple(null, Integer.MIN_VALUE);
+
+        if(depth == 0)
+            return new MinMaxTuple(null, board.evaluate(this.computerPlayer));
 
         int v = Integer.MIN_VALUE;
 
         List<Move> moves = board.getPossibleMoves(computerPlayer);
 
+        Move bestMove = null;
+
         for(Move move : moves){
-            v = Math.max(v, minValue(board, alpha, beta, depth - 1));
+            board.move(this.computerPlayer, move);
+
+            MinMaxTuple minTuple = minValue(board, alpha, beta, depth - 1);
+
+            if(v < minTuple.value){
+                v = minTuple.value;
+                bestMove = minTuple.move;
+            }
+
+            board.remove(this.computerPlayer, move);
+
             if(v >= beta)
-                return v;
+                return new MinMaxTuple(move, v);
+
             alpha = Math.max(alpha, v);
         }
 
-        return v;
+        return new MinMaxTuple(bestMove, v);
 
     }
 
-    public int minValue(IsolationBoard board, int alpha, int beta, int depth){
-        
+    public MinMaxTuple minValue(IsolationBoard board, int alpha, int beta, int depth) throws NoTimeException {
+
+        checkTime();
+
         if(board.isTerminal(this.opponentPlayer))
-            return Integer.MAX_VALUE;
+            return new MinMaxTuple(null, Integer.MAX_VALUE);
 
-
+        if(depth == 0)
+            return new MinMaxTuple(null, board.evaluate(this.opponentPlayer));
 
         int v = Integer.MAX_VALUE;
 
         List<Move> moves = board.getPossibleMoves(opponentPlayer);
 
-        for(Move move : moves){
-            v = Math.min(v, maxValue(board, alpha, beta, depth - 1));
+        Move bestMove = null;
 
-            if(v <= alpha){
-                return v;
+        for(Move move : moves){
+            board.move(this.opponentPlayer, move);
+
+            MinMaxTuple maxTuple = maxValue(board, alpha, beta, depth - 1);
+
+            if(v > maxTuple.value){
+                v = maxTuple.value;
+                bestMove = maxTuple.move;
             }
-            
-                beta = Math.min(beta, v);
+
+            board.remove(this.opponentPlayer, move);
+
+            if(v <= alpha)
+                return new MinMaxTuple(move, v);
+
+            beta = Math.min(beta, v);
         }
 
-        return v;
+        return new MinMaxTuple(bestMove, v);
+
     }
 
+    private void checkTime() throws NoTimeException {
+        if((System.currentTimeMillis() - start) > time)
+            throw new NoTimeException();
+    }
 
     private class MinMaxTuple {
 
