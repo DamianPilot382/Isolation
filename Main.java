@@ -3,14 +3,6 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args){
-        IsolationBoard board = new IsolationBoard();
-
-        System.out.println(board);
-
-        board.getPossibleMoves(Player.X);
-    }
-
-    public static void mains(String[] args){
         Scanner in = new Scanner(System.in);
 
         startGame(in);
@@ -19,11 +11,39 @@ public class Main {
     public static void startGame(Scanner in){
 
         int timeout = getTimeout(in);
-        char next = getWhoGoesFirst(in);
-       
+        Player computer = getComputerPlayer(in);
+
+        IsolationBoard board = new IsolationBoard();
+
+        Agent agent = new Agent(timeout, computer);
+
+        Player next = Player.X;
+
+        while(true){
+
+            if(board.isTerminal(next))
+                if(next == computer)
+                    System.out.println("Player wins!");
+                else
+                    System.out.println("Computer wins!");
+
+            Move move;
+
+            if(computer == next){
+                System.out.println(board);
+                move = agent.search(board);
+                board.move(computer, move);
+            }else{
+                move = getMove(in);
+                board.move(Player.opponent(computer), move);
+            }
+
+            next = Player.opponent(next);
+        }
+
     }
 
-    public static char getWhoGoesFirst(Scanner in){
+    public static Player getComputerPlayer(Scanner in){
 
         char next = ' ';
 
@@ -41,12 +61,13 @@ public class Main {
 
         }
 
-        if(next == 'C')
+        if(next == 'C'){
             System.out.println("The computer will start the game.");
-        else
+            return Player.X;
+        }else{
             System.out.println("The opponent will start the game.");
-
-        return next;
+            return Player.O;
+        }
     }
 
     public static int getTimeout(Scanner in){

@@ -16,7 +16,7 @@ public class IsolationBoard {
         this.locO = new int[]{7, 7};
         this.usedSpaces = new boolean[64];
         this.usedSpaces[0] = true;
-        this.usedSpaces[64] = true;
+        this.usedSpaces[63] = true;
     }
 
     public List<Move> getPossibleMoves(Player player){

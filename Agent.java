@@ -21,7 +21,7 @@ public class Agent {
         return iterativeDeepening(board);
     }
 
-    public Move iterativeDeepening(IsolationBoard board) {
+    private Move iterativeDeepening(IsolationBoard board) {
         Move bestMove = null;
         int depth = 3;
 
@@ -37,13 +37,13 @@ public class Agent {
 
     }
 
-    public Move alphaBetaSearch(IsolationBoard board, int depth) throws NoTimeException {
+    private Move alphaBetaSearch(IsolationBoard board, int depth) throws NoTimeException {
 
         return maxValue(board, Integer.MIN_VALUE, Integer.MAX_VALUE, depth).move;
 
     }
 
-    public MinMaxTuple maxValue(IsolationBoard board, int alpha, int beta, int depth) throws NoTimeException {
+    private MinMaxTuple maxValue(IsolationBoard board, int alpha, int beta, int depth) throws NoTimeException {
 
         checkTime();
 
@@ -81,7 +81,7 @@ public class Agent {
 
     }
 
-    public MinMaxTuple minValue(IsolationBoard board, int alpha, int beta, int depth) throws NoTimeException {
+    private MinMaxTuple minValue(IsolationBoard board, int alpha, int beta, int depth) throws NoTimeException {
 
         checkTime();
 
