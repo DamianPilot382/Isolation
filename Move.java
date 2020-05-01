@@ -13,9 +13,12 @@ public class Move {
         return ""+((char)(65+row)) + (col+1);
     }
 
-    public static void main(String[] args){
-        Move move = new Move(7, 7);
-        System.out.println(move);
+    public int getRow(){
+        return this.row;
+    }
+
+    public int getCol(){
+        return this.col;
     }
     
 }

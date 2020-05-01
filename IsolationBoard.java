@@ -7,7 +7,6 @@ public class IsolationBoard {
     protected int[] locX;
     protected int[] locO;
     protected boolean[] usedSpaces;
-    protected int spacesLeft;
 
 
     public IsolationBoard(){
@@ -16,7 +15,6 @@ public class IsolationBoard {
         this.usedSpaces = new boolean[64];
         this.usedSpaces[0] = true;
         this.usedSpaces[64] = true;
-        this.spacesLeft = 62;
     }
 
     public List<Move> getPossibleMoves(Player player){
@@ -34,7 +32,7 @@ public class IsolationBoard {
         boolean downLeft = true;
         boolean downRight = true;
 
-        for(int i = 1; i < 8; i++){
+        for(int i = 1; i < 7; i++){
 
             if(loc[0] - i < 0){
                 up = false;
@@ -117,10 +115,6 @@ public class IsolationBoard {
             }
         }
 
-        for(Move move : moves){
-            System.out.println(move);
-        }
-
         return moves;
     }
 
@@ -135,7 +129,10 @@ public class IsolationBoard {
     public void move(Player player, Move move){
         int[] loc = player == Player.X? locX : locO;
         setBoard(true, loc[0], loc[1]);
-        spacesLeft--;
+    }
+
+    public void remove(Player player, Move move){
+
     }
 
     public IsolationBoard copy(){
@@ -145,8 +142,6 @@ public class IsolationBoard {
         copy.locX = Arrays.copyOf(this.locX, locX.length);
 
         copy.usedSpaces = Arrays.copyOf(this.usedSpaces, usedSpaces.length);
-
-        copy.spacesLeft = this.spacesLeft;
 
         return copy;
     }
@@ -173,7 +168,11 @@ public class IsolationBoard {
     }
 
     public long getHashValue(){
-        return Arrays.hashCode(usedSpaces);
+        long result = 0;
+        for(boolean next : usedSpaces){
+            result = (result << 1) + (next? 1: 0);
+        }
+        return result;
     }
 
     public int getPositionsHash(){
@@ -187,18 +186,38 @@ public class IsolationBoard {
 
     }
 
-    public int value(Heuristic heuristic){
-        switch(heuristic){
-            case MOVE_COUNT:
-                return getMoveCountHeuristic();
-            default:
-                return 0;
-        }
-
+    public boolean isTerminal(Player player){
+        return this.getPossibleMoves(player).size() == 0;
     }
 
-    private int getMoveCountHeuristic(){
-        return -1;
+    public boolean isMoveValid(Move move, Player player){
+        int[] loc = (player == Player.X)? locX : locO;
+
+        //Check horizontal (row)
+        if(loc[0] == move.getRow()){
+            int min = 0;
+            int max = 0;
+
+            if(loc[0] < move.getRow()){
+                min = loc[0];
+                max = move.getRow();
+            }else{
+                min = move.getRow();
+                max = loc[0];
+            }
+
+            for(int i = min; i < max; i++){
+                
+            }
+        }
+
+        //Check vertical (col)
+
+        //Check diagonals
+    }
+
+    public int evaluate(){
+        return 1;
     }
 
 }
