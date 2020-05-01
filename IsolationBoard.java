@@ -33,6 +33,9 @@ public class IsolationBoard {
         boolean downRight = true;
 
         for(int i = 1; i < 7; i++){
+            
+            if(!(left || right || up || down || upLeft || upRight || downLeft || downRight))
+                break;
 
             if(loc[0] - i < 0){
                 up = false;
@@ -58,80 +61,57 @@ public class IsolationBoard {
                 downRight = false;
             }
 
-            if(up){
-                if(getBoard(loc[0]-i, loc[1]))
-                    up = false;
-                else
-                    moves.add(new Move(loc[0] - i, loc[1]));
-            }
+            up = checkMoveAuxiliary(up, loc, moves, -i, 0);
+            down = checkMoveAuxiliary(down, loc, moves, i, 0);
+            left = checkMoveAuxiliary(left, loc, moves, 0, -i);
+            right = checkMoveAuxiliary(right, loc, moves, 0, i);
 
-            if(down){
-                if(getBoard(loc[0]+i, loc[1]))
-                    down = false;
-                else
-                    moves.add(new Move(loc[0] + i, loc[1]));
-            }
+            upLeft = checkMoveAuxiliary(upLeft, loc, moves, -i, -i);
+            upRight = checkMoveAuxiliary(upRight, loc, moves, -i, i);
+            downLeft = checkMoveAuxiliary(downLeft, loc, moves, i, -i);
+            downRight = checkMoveAuxiliary(downRight, loc, moves, i, i);
 
-            if(left){
-                if(getBoard(loc[0], loc[1]-i))
-                    down = false;
-                else
-                    moves.add(new Move(loc[0], loc[1]-i));
-            }
-            
-            if(right){
-                if(getBoard(loc[0], loc[1]+i))
-                    down = false;
-                else
-                    moves.add(new Move(loc[0], loc[1]+i));
-            }
-
-            if(upLeft){
-                if(getBoard(loc[0]-i, loc[1]-i))
-                    down = false;
-                else
-                    moves.add(new Move(loc[0]-i, loc[1]-i));
-            }
-
-            if(upRight){
-                if(getBoard(loc[0]-i, loc[1]+i))
-                    down = false;
-                else
-                    moves.add(new Move(loc[0]-i, loc[1]+i));
-            }
-
-            if(downLeft){
-                if(getBoard(loc[0]+i, loc[1]-i))
-                    down = false;
-                else
-                    moves.add(new Move(loc[0]+i, loc[1]-i));
-            }
-
-            if(downRight){
-                if(getBoard(loc[0]+i, loc[1]+i))
-                    down = false;
-                else
-                    moves.add(new Move(loc[0]+i, loc[1]+i));
-            }
         }
 
         return moves;
     }
 
-    public void setBoard(boolean value, int row, int col){
+    private boolean checkMoveAuxiliary(boolean value, int[] loc, List<Move> moves, int rowOffset, int colOffset){
+        
+        if(value){
+            if(getBoard(loc[0]+rowOffset, loc[1]+colOffset))
+                return false;
+            
+            moves.add(new Move(loc[0]+rowOffset, loc[1]+colOffset));
+            return true;
+        }
+        return false;
+    }
+
+    private void setBoard(boolean value, int row, int col){
         usedSpaces[(row << 3) + col] = value;
     }
 
-    public boolean getBoard(int row, int col){
+    private boolean getBoard(int row, int col){
         return usedSpaces[(row << 3) + col];
     }
 
     public void move(Player player, Move move){
         int[] loc = player == Player.X? locX : locO;
+
+        loc[0] = move.row;
+        loc[1] = move.col;
+
         setBoard(true, loc[0], loc[1]);
     }
 
     public void remove(Player player, Move move){
+        int[] loc = player == Player.X? locX : locO;
+
+        setBoard(false, loc[0], loc[1]);
+
+        loc[0] = move.row;
+        loc[1] = move.col;
 
     }
 
@@ -167,53 +147,43 @@ public class IsolationBoard {
         return builder.toString();
     }
 
-    public long getHashValue(){
-        long result = 0;
-        for(boolean next : usedSpaces){
-            result = (result << 1) + (next? 1: 0);
-        }
-        return result;
-    }
-
-    public int getPositionsHash(){
-        int result = locX[0];
-        result = (result << 3) + locX[1];
-
-        result = (result << 3) + locO[0];
-        result = (result << 3) + locO[1];
-
-        return result;
-
-    }
-
     public boolean isTerminal(Player player){
         return this.getPossibleMoves(player).size() == 0;
     }
 
     public boolean isMoveValid(Move move, Player player){
+
+        if(getBoard(move.row, move.col))
+            return false;
+    
         int[] loc = (player == Player.X)? locX : locO;
-
-        //Check horizontal (row)
-        if(loc[0] == move.getRow()){
-            int min = 0;
-            int max = 0;
-
-            if(loc[0] < move.getRow()){
-                min = loc[0];
-                max = move.getRow();
-            }else{
-                min = move.getRow();
-                max = loc[0];
+    
+        int rowMult = (loc[0] < move.row)? 1: -1;
+        int colMult = (loc[1] < move.col)? 1: -1;
+    
+        if(loc[0] == move.row)
+            rowMult = 0;
+        if(loc[1] == move.col)
+            rowMult = 0;
+    
+        int row = loc[0] + rowMult;
+        int col = loc[1] + colMult;
+    
+        while(row != move.row && col != move.col){
+    
+            try{
+                if(getBoard(row, col))
+                    return false;
+            }catch(ArrayIndexOutOfBoundsException e){
+                return false;
             }
-
-            for(int i = min; i < max; i++){
-                
-            }
+    
+            row += rowMult;
+            col += colMult;
         }
-
-        //Check vertical (col)
-
-        //Check diagonals
+    
+        return (row == move.row && col == move.col);
+    
     }
 
     public int evaluate(){
