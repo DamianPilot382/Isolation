@@ -1,12 +1,16 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class IsolationBoard {
 
     protected int[] locX;
     protected int[] locO;
     protected boolean[] usedSpaces;
+    protected LinkedList<Move> moves;
+
     protected List<Move> movesX;
     protected List<Move> movesO;
 
@@ -17,6 +21,8 @@ public class IsolationBoard {
         this.usedSpaces = new boolean[64];
         this.usedSpaces[0] = true;
         this.usedSpaces[63] = true;
+        this.moves = new LinkedList<Move>();
+
     }
 
     public List<Move> getPossibleMoves(Player player){
@@ -121,6 +127,8 @@ public class IsolationBoard {
 
         movesX = null;
         movesO = null;
+
+        moves.add(move);
     }
 
     public void remove(Player player, Move move){
@@ -134,22 +142,29 @@ public class IsolationBoard {
         movesX = null;
         movesO = null;
 
+        moves.remove();
+
     }
 
+    @SuppressWarnings("unchecked")
     public IsolationBoard copy(){
         IsolationBoard copy = new IsolationBoard();
 
         copy.locO = Arrays.copyOf(this.locO, locO.length);
         copy.locX = Arrays.copyOf(this.locX, locX.length);
 
+        copy.moves = (LinkedList<Move>) (this.moves.clone());
+
         copy.usedSpaces = Arrays.copyOf(this.usedSpaces, usedSpaces.length);
 
         return copy;
     }
 
-    @Override
-    public String toString(){
-        StringBuilder builder = new StringBuilder("  1 2 3 4 5 6 7 8\tComputer vs. Opponent\n");
+    public String[] getPrintableBoard(){
+        String[] result = new String[9];
+        result[0] = "  1 2 3 4 5 6 7 8";
+        StringBuilder builder = new StringBuilder();
+
         for(int i = 0; i < 8; i++){
             builder.append((char)(65 + i) + " ");
             for(int j = 0; j < 8; j++){
@@ -162,10 +177,11 @@ public class IsolationBoard {
                 else
                     builder.append("- ");
             }
-            builder.append("\t   " + (i+1) + ". " + 123 + "\n");
+            result[i+1] = builder.toString();
+            builder.delete(0, builder.length());
         }
 
-        return builder.toString();
+        return result;
     }
 
     public boolean isTerminal(Player player){
@@ -185,12 +201,12 @@ public class IsolationBoard {
         if(loc[0] == move.row)
             rowMult = 0;
         if(loc[1] == move.col)
-            rowMult = 0;
+            colMult = 0;
     
         int row = loc[0] + rowMult;
         int col = loc[1] + colMult;
     
-        while(row != move.row && col != move.col){
+        while(row != move.row || col != move.col){
     
             try{
                 if(getBoard(row, col))

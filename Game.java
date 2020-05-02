@@ -1,4 +1,6 @@
 import java.util.Scanner;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class Game {
 
@@ -13,10 +15,13 @@ public class Game {
 
     private int time;
 
+    private LinkedList<Move> moves;
+
     public Game(){
         this.in = new Scanner(System.in);
         this.board = new IsolationBoard();
         this.next = Player.X;
+        this.moves = new LinkedList<Move>();
     }
 
     public void start(){
@@ -27,27 +32,41 @@ public class Game {
 
         this.agent = new Agent(this.time, computer);
 
-        Player next = Player.X;
+        this.gameLoop();
 
+    }
+
+    private void gameLoop(){
         while(true){
 
-            if(board.isTerminal(next))
-                if(next == computer)
+            if(board.isTerminal(next)){
+                this.printBoard();
+                if(next == computer){
                     System.out.println("Player wins!");
-                else
+                    return;
+                }else{
                     System.out.println("Computer wins!");
-
-            if(computer == next){
-                System.out.println(board);
-                Move move = agent.search(board);
-                board.move(computer, move);
-            }else{
-                board.move(opponent, getMove());
+                    return;
+                }
             }
 
-            next = Player.opponent(next);
-        }
+            Move move = null;
 
+            if(computer == this.next){
+                move = agent.search(board);
+                board.move(computer, move);
+                this.moves.add(move);
+
+                this.printBoard();
+                System.out.println("Computer's move is: " + move);
+            }else{
+                move = getMove();
+                board.move(opponent, move);
+                this.moves.add(move);
+            }
+
+            this.next = Player.opponent(this.next);
+        }
     }
 
     private Player getComputerPlayer(){
@@ -61,20 +80,45 @@ public class Game {
             next = in.next().toUpperCase().charAt(0);
             in.nextLine();
 
-            if(next == 'C' || next == 'O')
-                break;
+            if(next == 'C'){
+                System.out.println("The computer will start the game.");
+                return Player.X;
+            }else if(next == 'O'){
+                System.out.println("The opponent will start the game.");
+                this.printBoard();
+                return Player.O;
+            }
 
             System.out.println("Invalid input. Try again.");
 
         }
+    }
 
-        if(next == 'C'){
-            System.out.println("The computer will start the game.");
-            return Player.X;
-        }else{
-            System.out.println("The opponent will start the game.");
-            return Player.O;
+    private void printBoard(){
+        String[] boardString = this.board.getPrintableBoard();
+        Iterator<Move> movesIterator = this.moves.iterator();
+
+        System.out.print(boardString[0] + "\t");
+        System.out.println(this.computer == Player.X? "Computer vs. Opponent": "Opponent vs. Computer");
+
+        for(int counter = 1; counter < boardString.length || movesIterator.hasNext(); counter++){
+            if(counter < boardString.length){
+                System.out.print(boardString[counter]);
+            }else{
+                System.out.print("\t\t");
+            }
+
+            if(movesIterator.hasNext()){
+                System.out.print("\t   " + (counter) + ". " + movesIterator.next());
+
+                if(movesIterator.hasNext()){
+                    System.out.print("   " + movesIterator.next());
+                }
+            }
+
+            System.out.println();
         }
+
     }
 
     private int getTimeout(){
@@ -87,17 +131,16 @@ public class Game {
                 timeout = Integer.parseInt(in.next());
                 in.nextLine();
                 if(timeout > 0)
-                    break;
+                    return timeout;
 
             }catch(Exception e){
-                
+                in.nextLine();
             }
 
             System.out.println("Invalid input. Please try again.");
 
         }
 
-        return timeout;
     }
 
     private Move getMove(){
@@ -106,6 +149,7 @@ public class Game {
             System.out.print("Enter opponent's move: ");
 
             String input = in.next().toUpperCase();
+            in.nextLine();
 
             Move move = validateMove(input);
             if(move != null)

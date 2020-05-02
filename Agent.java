@@ -27,6 +27,7 @@ public class Agent {
 
         try{
             while(true){
+                //System.out.println(depth);
                 bestMove = alphaBetaSearch(board, depth);
     
                 depth++;
@@ -39,7 +40,9 @@ public class Agent {
 
     private Move alphaBetaSearch(IsolationBoard board, int depth) throws NoTimeException {
 
-        return maxValue(board, Integer.MIN_VALUE, Integer.MAX_VALUE, depth).move;
+        IsolationBoard boardCopy = board.copy();
+
+        return maxValue(boardCopy, Integer.MIN_VALUE, Integer.MAX_VALUE, depth).move;
 
     }
 
