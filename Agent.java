@@ -27,12 +27,15 @@ public class Agent {
 
         try{
             while(true){
-                //System.out.println(depth);
                 bestMove = alphaBetaSearch(board, depth);
     
                 depth++;
             }
         }catch(NoTimeException e){
+            if(bestMove == null){
+                System.out.println("Computer ran out of time. Random move generated.");
+                return board.getPossibleMoves(this.computerPlayer).get(0);
+            }
             return bestMove;
         }
 

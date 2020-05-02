@@ -53,6 +53,7 @@ public class Game {
             Move move = null;
 
             if(computer == this.next){
+                System.out.println("Computer is thinking...");
                 move = agent.search(board);
                 board.move(computer, move);
                 this.moves.add(move);
@@ -63,6 +64,7 @@ public class Game {
                 move = getMove();
                 board.move(opponent, move);
                 this.moves.add(move);
+                this.printBoard();
             }
 
             this.next = Player.opponent(this.next);
@@ -82,6 +84,7 @@ public class Game {
 
             if(next == 'C'){
                 System.out.println("The computer will start the game.");
+                this.printBoard();
                 return Player.X;
             }else if(next == 'O'){
                 System.out.println("The opponent will start the game.");

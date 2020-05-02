@@ -1,15 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.Collections;
 
 public class IsolationBoard {
 
     protected int[] locX;
     protected int[] locO;
     protected boolean[] usedSpaces;
-    protected LinkedList<Move> moves;
 
     protected List<Move> movesX;
     protected List<Move> movesO;
@@ -21,7 +19,6 @@ public class IsolationBoard {
         this.usedSpaces = new boolean[64];
         this.usedSpaces[0] = true;
         this.usedSpaces[63] = true;
-        this.moves = new LinkedList<Move>();
 
     }
 
@@ -94,6 +91,8 @@ public class IsolationBoard {
 
         }
 
+        Collections.shuffle(moves);
+
         return moves;
     }
 
@@ -118,7 +117,7 @@ public class IsolationBoard {
     }
 
     public void move(Player player, Move move){
-        int[] loc = player == Player.X? locX : locO;
+        int[] loc = (player == Player.X)? locX : locO;
 
         loc[0] = move.row;
         loc[1] = move.col;
@@ -128,7 +127,6 @@ public class IsolationBoard {
         movesX = null;
         movesO = null;
 
-        moves.add(move);
     }
 
     public void remove(Player player, Move move){
@@ -142,18 +140,13 @@ public class IsolationBoard {
         movesX = null;
         movesO = null;
 
-        moves.remove();
-
     }
 
-    @SuppressWarnings("unchecked")
     public IsolationBoard copy(){
         IsolationBoard copy = new IsolationBoard();
 
         copy.locO = Arrays.copyOf(this.locO, locO.length);
         copy.locX = Arrays.copyOf(this.locX, locX.length);
-
-        copy.moves = (LinkedList<Move>) (this.moves.clone());
 
         copy.usedSpaces = Arrays.copyOf(this.usedSpaces, usedSpaces.length);
 
