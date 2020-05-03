@@ -1,16 +1,41 @@
 import java.util.List;
 
+/**
+ * @author Damian Ugalde
+ * @date 2020-05-03
+ * @version 1.0
+ *
+ * Project 4 - Isolation
+ * CS 4200 - Artificial Intelligence
+ * California State Polytechnic University, Pomona
+ * Computer Science Department
+ *
+ * Instructor: Dominick A. Atanasio
+ *
+ */
 public class Agent {
 
+    //Time allocated for the compuer per move in milliseconds
     private int time;
+
+    //Time when the computer began searching in milliseconds
     private long start;
+
+    //Keeping track of which player is which piece.
     private Player computerPlayer;
     private Player opponentPlayer;
 
+    /**
+     * Creates a new Agent object
+     * @param time time in seconds that the computer is alloted per move.
+     * @param computerPlayer piece to represent the computer.
+     */
     public Agent(int time, Player computerPlayer){
 
+        //Convert the time from seconds to milliseconds
         this.time = time * 1000;
 
+        //Set the players' pieces
         this.computerPlayer = computerPlayer;
         this.opponentPlayer = Player.opponent(computerPlayer);
 
