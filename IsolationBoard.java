@@ -368,22 +368,22 @@ public class IsolationBoard {
         //Matrix used to give higher weight to certain board positions.
         //In this case, higher weight is given to move in the center of the board.
         int[] boardPositionWeight = new int[]{
-            0, 1, 2, 3, 3, 2, 1, 0,
-            1, 2, 3, 4, 4, 3, 2, 1,
-            2, 3, 4, 5, 5, 4, 3, 2,
-            3, 4, 5, 6, 6, 5, 4, 3,
-            3, 4, 5, 6, 6, 5, 4, 3,
-            2, 3, 4, 5, 5, 4, 3, 2,
-            1, 2, 3, 4, 4, 3, 2, 1,
-            0, 1, 2, 3, 3, 2, 1, 0,
+            -10, 1, 2, 3, 3, 2, 1, -5,
+            0, 1, 2, 4, 4, 2, 1, 0,
+            1, 2, 4, 5, 5, 4, 2, 1,
+            2, 4, 5, 6, 6, 5, 4, 2,
+            2, 4, 5, 6, 6, 5, 4, 2,
+            1, 2, 4, 5, 5, 4, 2, 1,
+            0, 1, 2, 4, 4, 2, 1, 0,
+            -5, 1, 2, 3, 3, 2, 1, -10,
         };
 
         //Get the value of the weight by comparing it to the position of the player.
         int boardPositionWeightValue = boardPositionWeight[(loc[0] << 3) + loc[1]];
 
         //Formula:
-        //2*(CPU_moves - Opp_moves) - boardPosWeight
-        return ((computerMovesAvailable - opponentMovesAvailable) << 1) + boardPositionWeightValue;
+        //(4*CPU_moves - 2*Opp_moves) - boardPosWeight
+        return ((computerMovesAvailable << 2) - (opponentMovesAvailable << 1)) + boardPositionWeightValue;
     }
 
 }

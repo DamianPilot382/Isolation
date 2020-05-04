@@ -26,7 +26,7 @@ public class Agent {
     private Player opponentPlayer;
 
     //Initial depth to start searching for iterative deepening.
-    public static final int INITIAL_DEPTH = 6;
+    public static final int INITIAL_DEPTH = 3;
 
     /**
      * Creates a new Agent object
